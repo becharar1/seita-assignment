@@ -1,11 +1,8 @@
 '''
 This suggests that all dependencies have been added
-'''
-from flask import Flask
-app = Flask(__name__)
-'''
 Import all required modules
 '''
+from flask import Flask
 import pandas as pd
 from pandas.io.formats.style_render import DataFrame
 from datetime import datetime
@@ -45,6 +42,7 @@ The data is then sorted in ascending order according to timely_beliefs
 '''
 Here the route is specified using flask with two inputs: now and then
 '''
+app = Flask(__name__)
 @app.route("/getforecast/<now>/<then>")
 def get_forecast(now, then):
     return (get_forecasts(now, then))
