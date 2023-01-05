@@ -22,3 +22,5 @@ The steps of the resolution are as follows:
 	4. check in three different functions if the weather is warm, sunny or windy
 	5. realize a flask app that asks the user for the date and retuns the api with the required answers
 	6. error handling if date is not in table or if information inputted is not a date
+
+The usage was realized directly from the command line interface
