@@ -1,17 +1,35 @@
+'''
+This suggests that all dependencies have been added
+'''
 from flask import Flask
-
 app = Flask(__name__)
+'''
+Import all required modules
+'''
 import pandas as pd
-df=pd.read_csv("weather.csv", delimiter= ',')
 from pandas.io.formats.style_render import DataFrame
 from datetime import datetime
 from datetime import timedelta
+df=pd.read_csv("weather.csv", delimiter= ',')
+'''
+This is the function that enables to get the relevant forecasts
+'''
 def get_forecasts(now,then,df=df):
+''' 
+The dates are first parsed from string to datetime
+The difference in time is calculated
+The data relevant to the specified then date is extracted
+The data is then sorted in ascending order according to timely_beliefs
+'''
   time_now=datetime.strptime(now,'%Y-%m-%d%H:%M:%S')
   time_then=datetime.strptime(then,'%Y-%m-%d%H:%M:%S')
   diff=(time_then-time_now).total_seconds()
   dfthen = df.loc[df['event_start'].str.contains(str(time_then), case=False)]
   dfthen=dfthen.sort_values(by="belief_horizon_in_sec")
+  '''
+  a loop is here realized to obtain at max the first three forecasts with timely_beliefs greater than the difference
+  This corresponds to three most relevant values. The program indicates also if no values are found 
+  '''
   i=0
   ipertinent=0
   dfpertinent = pd.DataFrame(columns=['event_value','sensor','unit'])
@@ -24,9 +42,9 @@ def get_forecasts(now,then,df=df):
     return (dfpertinent.to_string())
   else:
     return ("no safe predictions could be made")
-@app.route("/")
-def hello_world():
-    return "Hello, World!"
+'''
+Here the route is specified using flask with two inputs: now and then
+'''
 @app.route("/getforecast/<now>/<then>")
 def get_forecast(now, then):
     return (get_forecasts(now, then))
