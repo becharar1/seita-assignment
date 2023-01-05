@@ -11,13 +11,13 @@ df=pd.read_csv("weather.csv", delimiter= ',')
 '''
 This is the function that enables to get the relevant forecasts
 '''
-def get_forecasts(now,then,df=df):
-''' 
-The dates are first parsed from string to datetime
-The difference in time is calculated
-The data relevant to the specified then date is extracted
-The data is then sorted in ascending order according to timely_beliefs
-'''
+def get_forecasts(now,then,df=df): 
+  ''' 
+  The dates are first parsed from string to datetime
+  The difference in time is calculated
+  The data relevant to the specified then date is extracted
+  The data is then sorted in ascending order according to timely_beliefs
+  '''
   time_now=datetime.strptime(now,'%Y-%m-%d%H:%M:%S')
   time_then=datetime.strptime(then,'%Y-%m-%d%H:%M:%S')
   diff=(time_then-time_now).total_seconds()
