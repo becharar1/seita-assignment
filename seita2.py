@@ -1,11 +1,21 @@
+'''
+This suggests that all dependencies have been added
+Import all required modules
+'''
 from flask import Flask
-app = Flask(__name__)
 import pandas as pd
-df=pd.read_csv("weather.csv", delimiter= ',')
 from pandas.io.formats.style_render import DataFrame
 from datetime import datetime
 from datetime import timedelta
+df=pd.read_csv("weather.csv", delimiter= ',')
+'''
+This is the function that gives the forecasts for the day following the specified now
+'''
 def get_tomorrow(now,df=df):
+  
+  '''
+  The try method studies the presence of a first error namely now that is not in the proper date format
+  '''
   try:
     time_now = datetime.strptime(now, '%Y-%m-%d')
     time_tomorrow=time_now+timedelta(days=1)
@@ -15,8 +25,16 @@ def get_tomorrow(now,df=df):
     windy_threshold=5
     #calculate tomorrow's date
     strtomorrow=str(time_tomorrow.date())
+    '''
+    here the dataframe for tomorrow's date is extracted
+    an error handling mechanism is included that indicates if forecasts are available for this date or no
+    '''
     dfdate = df.loc[df['event_start'].str.contains(strtomorrow, case=False)]
     if len(dfdate)>0:
+      '''
+      if forecasts are available we run three separate programs iwarm, issunny and iswindy
+      We return the answer as a string
+      '''
       warm=iswarm(dfdate,warm_threshold)
       awarm=""
       if not warm: 
@@ -34,6 +52,12 @@ def get_tomorrow(now,df=df):
       return "No data is available for the chosen date"
   except ValueError:
         return "The entered value is not a date"
+    
+'''
+Here are the three functions iswarm, issunny and iswindy
+We consider the temperature warm if one value is higher than the threshold
+The same applies for sunny and windy
+'''
 def iswarm(dfdate:DataFrame,warm_threshold):
   #function get info about temperature
   dftemp=dfdate.loc[dfdate['sensor'] == 'temperature']
@@ -71,9 +95,10 @@ def iswindy(dfdate:DataFrame,windy_threshold):
       i=i+1
   return windy
 
-@app.route("/")
-def hello_world():
-    return "Hello, World!"
+'''
+Here we run the flask app with the specified time input
+'''
+
 @app.route("/gettomorrow/<time>")
 def get_now(time):
     return str(get_tomorrow(time))
