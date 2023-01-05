@@ -98,7 +98,7 @@ def iswindy(dfdate:DataFrame,windy_threshold):
 '''
 Here we run the flask app with the specified time input
 '''
-
+app = Flask(__name__)
 @app.route("/gettomorrow/<time>")
 def get_now(time):
     return str(get_tomorrow(time))
