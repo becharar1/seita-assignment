@@ -35,10 +35,8 @@ def get_forecasts(now,then,df=df):
       dfpertinent.loc[ipertinent]=dfthen.iloc[i,2:5]
       ipertinent+=1
     i=i+1
-  if len(dfpertinent)>0:
-    return (dfpertinent.to_string())
-  else:
-    return ("no safe predictions could be made")
+  return (dfpertinent.to_json(orient = 'records',force_ascii=False,lines=True))
+
 '''
 Here the route is specified using flask with two inputs: now and then
 '''
