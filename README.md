@@ -23,4 +23,15 @@ The steps of the resolution are as follows:
 	5. realize a flask app that asks the user for the date and retuns the api with the required answers
 	6. error handling if date is not in table or if information inputted is not a date
 
-The usage was realized directly from the command line interface
+The usage was realized directly from the command line interface. In order to run this command you can do the following:
+	1. download the github repos with the applications and the csv file
+	2. install flask dependencies and other required python modules (pandas, datetime)
+	2. open the terminal, access the folder and type the following commands:
+		- "flask --app seita1 run" for seita1.py
+		- "flask --app seita2 run" for seita2.py
+	3. In order to interrogate the system open a browser and type the following example:
+		- for seita1: http://localhost:5000/getforecast/2020-11-0100:00:00/2020-11-0110:00:00
+		- for seita2: http://localhost:5000/gettomorrow/2021-11-01%2000:00:00+00
+	4. The results are given in a json format
+
+The files could be containerized as docker images in another installment
