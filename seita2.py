@@ -16,9 +16,13 @@ def get_tomorrow(now,df=df):
   '''
   The try method studies the presence of a first error namely now that is not in the proper date format
   '''
+
+  dfweather = pd.DataFrame(columns=['warm','sunny','windy'])
   try:
-    time_now = datetime.strptime(now, '%Y-%m-%d')
+    time_now = datetime.strptime(now, '%Y-%m-%d %H:%M:%S+00')
     time_tomorrow=time_now+timedelta(days=1)
+    timestart_tomorrow= datetime(time_tomorrow.year, time_tomorrow.month, time_tomorrow.day,0,0,0)
+    min_diff=(timestart_tomorrow-time_now).total_seconds()
     #specifying thresholds
     warm_threshold=10
     sunny_threshold=100
@@ -26,33 +30,21 @@ def get_tomorrow(now,df=df):
     #calculate tomorrow's date
     strtomorrow=str(time_tomorrow.date())
     '''
-    here the dataframe for tomorrow's date is extracted
+    here the dataframe for tomorrow's date is extracted and filtered with  predictions that are relevant to now's date
     an error handling mechanism is included that indicates if forecasts are available for this date or no
     '''
     dfdate = df.loc[df['event_start'].str.contains(strtomorrow, case=False)]
+    dfdate=dfdate.loc[filter_df_beliefs(dfdate, time_now)]
     if len(dfdate)>0:
       '''
       if forecasts are available we run three separate programs iwarm, issunny and iswindy
-      We return the answer as a string
+      We return the answer as a data frame to be later turned into json
       '''
-      warm=iswarm(dfdate,warm_threshold)
-      awarm=""
-      if not warm: 
-        awarm="not"
-      asunny=","
-      sunny=issunny(dfdate,sunny_threshold)
-      if not sunny:
-        asunny="not"
-      awindy="and"
-      windy=iswindy(dfdate, windy_threshold)
-      if not windy:
-        awindy="not"
-      return "tomorrow's weather is " + awarm + " warm " + asunny +" sunny " +awindy + " windy" 
-    else:
-      return "No data is available for the chosen date"
+      dfweather.loc['0']=[iswarm(dfdate,warm_threshold),issunny(dfdate,sunny_threshold)
+      ,iswindy(dfdate, windy_threshold)]
+      return dfweather.to_json(orient = 'records',force_ascii=False,lines=True)   
   except ValueError:
-        return "The entered value is not a date"
-    
+    return None
 '''
 Here are the three functions iswarm, issunny and iswindy
 We consider the temperature warm if one value is higher than the threshold
@@ -94,7 +86,16 @@ def iswindy(dfdate:DataFrame,windy_threshold):
     else:
       i=i+1
   return windy
-
+'''
+This function filters the beliefs in tomorrow's date to provide only those done at the time now
+'''
+def filter_df_beliefs(dfdate, time_now):
+  dfdiff = pd.DataFrame(columns=['diff'])
+  dfdiff.loc[:,'diff']=pd.to_datetime(dfdate.event_start, format='%Y-%m-%d %H:%M:%S+00')
+  dfdiff.loc[:,'diff']=(dfdiff['diff']-time_now).dt.total_seconds()
+  dfdiff.loc[:,'diff']=dfdate.belief_horizon_in_sec-dfdiff['diff'].astype(int)
+  dfdiff.drop(dfdiff[dfdiff['diff']<0].index,inplace=True)
+  return (dfdiff.index)
 '''
 Here we run the flask app with the specified time input
 '''
